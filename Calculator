@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculatrice Pro</title>
+    <title>Calculatrice Pro & Convertisseur</title>
     <style>
         * {
             margin: 0;
@@ -16,12 +16,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
         }
 
-        .calculator {
+        .container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .calculator, .converter {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border-radius: 30px;
@@ -30,6 +39,20 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             max-width: 400px;
             width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .calculator:hover, .converter:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .display {
@@ -189,33 +212,176 @@
             display: grid;
         }
 
-        /* Animation pour les touches */
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+        /* Styles pour le convertisseur */
+        .converter-section {
+            margin-bottom: 20px;
         }
 
-        button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
+        .converter-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: block;
         }
 
-        button:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
+        .converter-select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            cursor: pointer;
+            outline: none;
         }
 
-        /* Scrollbar personnalisée */
+        .converter-select option {
+            background: #764ba2;
+            color: white;
+        }
+
+        .converter-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+        }
+
+        .converter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .unit-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            color: white;
+        }
+
+        .unit-box {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin: 0 5px;
+        }
+
+        .unit-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .unit-name {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .swap-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .swap-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: rotate(180deg);
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .convert-btn:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: rgba(52, 199, 89, 0.2);
+            border: 1px solid rgba(52, 199, 89, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-value {
+            color: #34c759;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .result-formula {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .category-tab.active {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .category-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .history::-webkit-scrollbar {
             width: 6px;
         }
@@ -230,8 +396,19 @@
             border-radius: 3px;
         }
 
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .calculator, .converter {
+                max-width: 100%;
+            }
+        }
+
         @media (max-width: 480px) {
-            .calculator {
+            .calculator, .converter {
                 padding: 15px;
             }
             
@@ -247,64 +424,130 @@
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <div class="mode-toggle">
-            <button class="mode-btn active" onclick="setMode('standard')">Standard</button>
-            <button class="mode-btn" onclick="setMode('scientific')">Scientifique</button>
+    <div class="container">
+        <!-- Calculatrice -->
+        <div class="calculator">
+            <h2>🧮 Calculatrice</h2>
+            
+            <div class="mode-toggle">
+                <button class="mode-btn active" onclick="setMode('standard')">Standard</button>
+                <button class="mode-btn" onclick="setMode('scientific')">Scientifique</button>
+            </div>
+
+            <div class="scientific-buttons" id="scientificButtons">
+                <button class="scientific" onclick="appendFunction('sin')">sin</button>
+                <button class="scientific" onclick="appendFunction('cos')">cos</button>
+                <button class="scientific" onclick="appendFunction('tan')">tan</button>
+                <button class="scientific" onclick="appendFunction('log')">log</button>
+                <button class="scientific" onclick="appendFunction('ln')">ln</button>
+                <button class="scientific" onclick="appendValue('^')">x^y</button>
+                <button class="scientific" onclick="appendValue('√')">√</button>
+                <button class="scientific" onclick="appendValue('π')">π</button>
+                <button class="scientific" onclick="appendValue('e')">e</button>
+                <button class="scientific" onclick="appendValue('(')">(</button>
+                <button class="scientific" onclick="appendValue(')')">)</button>
+                <button class="scientific" onclick="appendValue('!')">n!</button>
+            </div>
+
+            <div class="display">
+                <div class="previous-operand" id="previousOperand"></div>
+                <div class="current-operand" id="currentOperand">0</div>
+            </div>
+
+            <div class="buttons">
+                <button class="clear span-two" onclick="clearAll()">AC</button>
+                <button class="delete" onclick="deleteLast()">⌫</button>
+                <button class="operator" onclick="chooseOperation('÷')">÷</button>
+                
+                <button onclick="appendValue('7')">7</button>
+                <button onclick="appendValue('8')">8</button>
+                <button onclick="appendValue('9')">9</button>
+                <button class="operator" onclick="chooseOperation('×')">×</button>
+                
+                <button onclick="appendValue('4')">4</button>
+                <button onclick="appendValue('5')">5</button>
+                <button onclick="appendValue('6')">6</button>
+                <button class="operator" onclick="chooseOperation('-')">−</button>
+                
+                <button onclick="appendValue('1')">1</button>
+                <button onclick="appendValue('2')">2</button>
+                <button onclick="appendValue('3')">3</button>
+                <button class="operator" onclick="chooseOperation('+')">+</button>
+                
+                <button onclick="appendValue('0')">0</button>
+                <button onclick="appendValue('.')">.</button>
+                <button class="equals span-two" onclick="calculate()">=</button>
+            </div>
+
+            <div class="history" id="history">
+                <h3>Historique</h3>
+                <div id="historyList"></div>
+            </div>
         </div>
 
-        <div class="scientific-buttons" id="scientificButtons">
-            <button class="scientific" onclick="appendFunction('sin')">sin</button>
-            <button class="scientific" onclick="appendFunction('cos')">cos</button>
-            <button class="scientific" onclick="appendFunction('tan')">tan</button>
-            <button class="scientific" onclick="appendFunction('log')">log</button>
-            <button class="scientific" onclick="appendFunction('ln')">ln</button>
-            <button class="scientific" onclick="appendValue('^')">x^y</button>
-            <button class="scientific" onclick="appendValue('√')">√</button>
-            <button class="scientific" onclick="appendValue('π')">π</button>
-            <button class="scientific" onclick="appendValue('e')">e</button>
-            <button class="scientific" onclick="appendValue('(')">(</button>
-            <button class="scientific" onclick="appendValue(')')">)</button>
-            <button class="scientific" onclick="appendValue('!')">n!</button>
-        </div>
+        <!-- Convertisseur -->
+        <div class="converter">
+            <h2>🔄 Convertisseur</h2>
+            
+            <div class="category-tabs">
+                <button class="category-tab active" onclick="setCategory('length')">📏 Longueur</button>
+                <button class="category-tab" onclick="setCategory('weight')">⚖️ Poids</button>
+                <button class="category-tab" onclick="setCategory('temperature')">🌡️ Température</button>
+                <button class="category-tab" onclick="setCategory('volume')">💧 Volume</button>
+                <button class="category-tab" onclick="setCategory('area')">📐 Surface</button>
+            </div>
 
-        <div class="display">
-            <div class="previous-operand" id="previousOperand"></div>
-            <div class="current-operand" id="currentOperand">0</div>
-        </div>
+            <div class="converter-section">
+                <label class="converter-label">De :</label>
+                <select class="converter-select" id="fromUnit">
+                    <option value="m">Mètres (m)</option>
+                    <option value="km">Kilomètres (km)</option>
+                    <option value="cm">Centimètres (cm)</option>
+                    <option value="mm">Millimètres (mm)</option>
+                    <option value="ft">Pieds (ft)</option>
+                    <option value="in">Pouces (in)</option>
+                    <option value="yd">Yards (yd)</option>
+                    <option value="mi">Miles (mi)</option>
+                </select>
+            </div>
 
-        <div class="buttons">
-            <button class="clear span-two" onclick="clearAll()">AC</button>
-            <button class="delete" onclick="deleteLast()">⌫</button>
-            <button class="operator" onclick="appendValue('÷')">÷</button>
-            
-            <button onclick="appendValue('7')">7</button>
-            <button onclick="appendValue('8')">8</button>
-            <button onclick="appendValue('9')">9</button>
-            <button class="operator" onclick="appendValue('×')">×</button>
-            
-            <button onclick="appendValue('4')">4</button>
-            <button onclick="appendValue('5')">5</button>
-            <button onclick="appendValue('6')">6</button>
-            <button class="operator" onclick="appendValue('-')">−</button>
-            
-            <button onclick="appendValue('1')">1</button>
-            <button onclick="appendValue('2')">2</button>
-            <button onclick="appendValue('3')">3</button>
-            <button class="operator" onclick="appendValue('+')">+</button>
-            
-            <button onclick="appendValue('0')">0</button>
-            <button onclick="appendValue('.')">.</button>
-            <button class="equals span-two" onclick="calculate()">=</button>
-        </div>
+            <div class="unit-display">
+                <div class="unit-box">
+                    <input type="number" class="converter-input" id="inputValue" placeholder="0" step="any">
+                    <div class="unit-name" id="fromUnitName">mètres</div>
+                </div>
+                <button class="swap-btn" onclick="swapUnits()">⇄</button>
+                <div class="unit-box">
+                    <div class="unit-value" id="outputValue">-</div>
+                    <div class="unit-name" id="toUnitName">kilomètres</div>
+                </div>
+            </div>
 
-        <div class="history" id="history">
-            <h3>Historique</h3>
-            <div id="historyList"></div>
+            <div class="converter-section">
+                <label class="converter-label">Vers :</label>
+                <select class="converter-select" id="toUnit">
+                    <option value="km">Kilomètres (km)</option>
+                    <option value="m" selected>Mètres (m)</option>
+                    <option value="cm">Centimètres (cm)</option>
+                    <option value="mm">Millimètres (mm)</option>
+                    <option value="ft">Pieds (ft)</option>
+                    <option value="in">Pouces (in)</option>
+                    <option value="yd">Yards (yd)</option>
+                    <option value="mi">Miles (mi)</option>
+                </select>
+            </div>
+
+            <button class="convert-btn" onclick="convert()">Convertir</button>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-value" id="resultValue">0</div>
+                <div class="result-formula" id="resultFormula"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        // ========== CALCULATRICE ==========
         let currentOperand = '0';
         let previousOperand = '';
         let operation = undefined;
@@ -325,7 +568,7 @@
         }
 
         function formatNumber(number) {
-            if (number === '') return '';
+            if (number === '' || number === 'Erreur') return number;
             const stringNumber = number.toString();
             const integerDigits = parseFloat(stringNumber.split('.')[0]);
             const decimalDigits = stringNumber.split('.')[1];
@@ -346,6 +589,8 @@
             if (value === '.' && currentOperand.includes('.')) return;
             if (currentOperand === '0' && value !== '.') {
                 currentOperand = value.toString();
+            } else if (currentOperand === 'Erreur') {
+                currentOperand = value.toString();
             } else {
                 currentOperand = currentOperand.toString() + value.toString();
             }
@@ -353,13 +598,13 @@
         }
 
         function appendFunction(func) {
-            if (currentOperand === '0') currentOperand = '';
+            if (currentOperand === '0' || currentOperand === 'Erreur') currentOperand = '';
             currentOperand = currentOperand + func + '(';
             updateDisplay();
         }
 
         function chooseOperation(op) {
-            if (currentOperand === '') return;
+            if (currentOperand === '' || currentOperand === 'Erreur') return;
             if (previousOperand !== '') {
                 calculate();
             }
@@ -375,7 +620,6 @@
             const current = parseFloat(currentOperand);
             
             if (isNaN(prev) || isNaN(current)) {
-                // Essayer de calculer avec les fonctions scientifiques
                 try {
                     let expression = currentOperand
                         .replace(/×/g, '*')
@@ -384,7 +628,6 @@
                         .replace(/π/g, Math.PI)
                         .replace(/e/g, Math.E);
                     
-                    // Gestion des fonctions mathématiques
                     expression = expression.replace(/sin\(/g, 'Math.sin(');
                     expression = expression.replace(/cos\(/g, 'Math.cos(');
                     expression = expression.replace(/tan\(/g, 'Math.tan(');
@@ -393,8 +636,6 @@
                     expression = expression.replace(/√\(/g, 'Math.sqrt(');
                     expression = expression.replace(/√(\d+)/g, 'Math.sqrt($1)');
                     expression = expression.replace(/\^/g, '**');
-                    
-                    // Factorielle
                     expression = expression.replace(/(\d+)!/g, (match, n) => factorial(parseInt(n)));
                     
                     computation = eval(expression);
@@ -427,7 +668,6 @@
                 }
             }
             
-            // Ajouter à l'historique
             const historyItem = {
                 expression: previousOperand && operation ? 
                     `${formatNumber(previousOperand)} ${operation} ${formatNumber(currentOperand)}` : 
@@ -490,14 +730,199 @@
             document.getElementById('scientificButtons').classList.toggle('show', isScientificMode);
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.toggle('active', 
-                    (mode === 'standard' && btn.innerText === 'Standard') ||
-                    (mode === 'scientific' && btn.innerText === 'Scientifique')
+                    (mode === 'standard' && btn.innerText.includes('Standard')) ||
+                    (mode === 'scientific' && btn.innerText.includes('Scientifique'))
                 );
             });
         }
 
-        // Support clavier
+        // ========== CONVERTISSEUR ==========
+        const units = {
+            length: {
+                m: { name: 'Mètres', factor: 1 },
+                km: { name: 'Kilomètres', factor: 1000 },
+                cm: { name: 'Centimètres', factor: 0.01 },
+                mm: { name: 'Millimètres', factor: 0.001 },
+                ft: { name: 'Pieds', factor: 0.3048 },
+                in: { name: 'Pouces', factor: 0.0254 },
+                yd: { name: 'Yards', factor: 0.9144 },
+                mi: { name: 'Miles', factor: 1609.344 }
+            },
+            weight: {
+                kg: { name: 'Kilogrammes', factor: 1 },
+                g: { name: 'Grammes', factor: 0.001 },
+                mg: { name: 'Milligrammes', factor: 0.000001 },
+                t: { name: 'Tonnes', factor: 1000 },
+                lb: { name: 'Livres', factor: 0.453592 },
+                oz: { name: 'Onces', factor: 0.0283495 },
+                st: { name: 'Stones', factor: 6.35029 }
+            },
+            temperature: {
+                C: { name: 'Celsius' },
+                F: { name: 'Fahrenheit' },
+                K: { name: 'Kelvin' }
+            },
+            volume: {
+                l: { name: 'Litres', factor: 1 },
+                ml: { name: 'Millilitres', factor: 0.001 },
+                m3: { name: 'Mètres cubes', factor: 1000 },
+                gal: { name: 'Gallons (US)', factor: 3.78541 },
+                qt: { name: 'Quarts (US)', factor: 0.946353 },
+                pt: { name: 'Pintes (US)', factor: 0.473176 },
+                cup: { name: 'Cups (US)', factor: 0.24 },
+                fl oz: { name: 'Fl Oz (US)', factor: 0.0295735 }
+            },
+            area: {
+                m2: { name: 'Mètres carrés', factor: 1 },
+                km2: { name: 'Kilomètres carrés', factor: 1000000 },
+                cm2: { name: 'Centimètres carrés', factor: 0.0001 },
+                ha: { name: 'Hectares', factor: 10000 },
+                ft2: { name: 'Pieds carrés', factor: 0.092903 },
+                ac: { name: 'Acres', factor: 4046.86 },
+                mi2: { name: 'Miles carrés', factor: 2589988 }
+            }
+        };
+
+        let currentCategory = 'length';
+
+        function setCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const fromSelect = document.getElementById('fromUnit');
+            const toSelect = document.getElementById('toUnit');
+            
+            fromSelect.innerHTML = '';
+            toSelect.innerHTML = '';
+            
+            const categoryUnits = units[category];
+            let first = true;
+            
+            for (const [key, value] of Object.entries(categoryUnits)) {
+                const option1 = new Option(`${value.name} (${key})`, key);
+                const option2 = new Option(`${value.name} (${key})`, key);
+                
+                if (first) {
+                    option1.selected = true;
+                    first = false;
+                } else if (Object.keys(categoryUnits).indexOf(key) === 1) {
+                    option2.selected = true;
+                }
+                
+                fromSelect.add(option1);
+                toSelect.add(option2);
+            }
+            
+            updateUnitNames();
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('inputValue').value = '';
+            document.getElementById('outputValue').textContent = '-';
+        }
+
+        function updateUnitNames() {
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            
+            document.getElementById('fromUnitName').textContent = units[currentCategory][fromUnit].name.toLowerCase();
+            document.getElementById('toUnitName').textContent = units[currentCategory][toUnit].name.toLowerCase();
+        }
+
+        function swapUnits() {
+            const fromSelect = document.getElementById('fromUnit');
+            const toSelect = document.getElementById('toUnit');
+            
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            
+            updateUnitNames();
+            
+            const inputVal = document.getElementById('inputValue').value;
+            const outputVal = document.getElementById('outputValue').textContent;
+            
+            if (outputVal !== '-') {
+                document.getElementById('inputValue').value = outputVal;
+                convert();
+            }
+        }
+
+        function convert() {
+            const inputValue = parseFloat(document.getElementById('inputValue').value);
+            
+            if (isNaN(inputValue)) {
+                alert('Veuillez entrer une valeur valide');
+                return;
+            }
+            
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            
+            let result;
+            let formula;
+            
+            if (currentCategory === 'temperature') {
+                result = convertTemperature(inputValue, fromUnit, toUnit);
+                formula = getTemperatureFormula(inputValue, fromUnit, toUnit);
+            } else {
+                const fromFactor = units[currentCategory][fromUnit].factor;
+                const toFactor = units[currentCategory][toUnit].factor;
+                
+                const baseValue = inputValue * fromFactor;
+                result = baseValue / toFactor;
+                
+                formula = `1 ${fromUnit} = ${(fromFactor/toFactor).toExponential(4)} ${toUnit}`;
+            }
+            
+            document.getElementById('outputValue').textContent = formatResult(result);
+            document.getElementById('resultValue').textContent = formatResult(result) + ' ' + toUnit;
+            document.getElementById('resultFormula').textContent = formula;
+            document.getElementById('resultBox').classList.add('show');
+        }
+
+        function convertTemperature(value, from, to) {
+            if (from === to) return value;
+            
+            let celsius;
+            if (from === 'C') celsius = value;
+            else if (from === 'F') celsius = (value - 32) * 5/9;
+            else if (from === 'K') celsius = value - 273.15;
+            
+            if (to === 'C') return celsius;
+            else if (to === 'F') return (celsius * 9/5) + 32;
+            else if (to === 'K') return celsius + 273.15;
+        }
+
+        function getTemperatureFormula(value, from, to) {
+            if (from === to) return 'Aucune conversion nécessaire';
+            if (from === 'C' && to === 'F') return `(${value}°C × 9/5) + 32 = ${((value * 9/5) + 32).toFixed(2)}°F`;
+            if (from === 'F' && to === 'C') return `(${value}°F - 32) × 5/9 = ${((value - 32) * 5/9).toFixed(2)}°C`;
+            if (from === 'C' && to === 'K') return `${value}°C + 273.15 = ${(value + 273.15).toFixed(2)}K`;
+            if (from === 'K' && to === 'C') return `${value}K - 273.15 = ${(value - 273.15).toFixed(2)}°C`;
+            return 'Conversion complexe';
+        }
+
+        function formatResult(value) {
+            if (Math.abs(value) < 0.001 || Math.abs(value) > 1000000) {
+                return value.toExponential(4);
+            }
+            return parseFloat(value.toFixed(6)).toString();
+        }
+
+        // Écouteurs d'événements pour le convertisseur
+        document.getElementById('fromUnit').addEventListener('change', updateUnitNames);
+        document.getElementById('toUnit').addEventListener('change', updateUnitNames);
+        document.getElementById('inputValue').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') convert();
+        });
+
+        // Support clavier calculatrice
         document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return; // Ignorer si on tape dans l'input du convertisseur
+            
             if (e.key >= '0' && e.key <= '9') appendValue(e.key);
             if (e.key === '.') appendValue('.');
             if (e.key === '=' || e.key === 'Enter') calculate();
@@ -512,7 +937,9 @@
             if (e.key === '^') appendValue('^');
         });
 
+        // Initialisation
         updateDisplay();
+        updateUnitNames();
     </script>
 </body>
 </html>
